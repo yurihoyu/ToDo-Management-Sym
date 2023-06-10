@@ -37,8 +37,7 @@ public class TaskController {
 	 */
 
 	@GetMapping("/main")
-//	public String main(Model model, @ModelAttribute("form2") form2 form) {
-		public String main(Model model) {
+	public String main(Model model) {
 		// 1. 2次元表になるので、ListのListを用意する
 		List<List<LocalDate>> month = new ArrayList<>();
 
@@ -52,11 +51,20 @@ public class TaskController {
 		LocalDate day;
 		day = LocalDate.now();
 
-//		if(form.)
 		//その月の1日のLocalDate
 		day = LocalDate.of(day.getYear(), day.getMonthValue(), 1);
 
 		LocalDate start = day; // dayに月初が入っているタイミング
+
+		model.addAttribute("prev", day.minusMonths(1)); // dayに6/1が入っているタイミング
+		System.out.println("==================================================");
+		System.out.println(model.getAttribute("prev"));
+
+		System.out.println("==================================================");
+		model.addAttribute("next", day.plusMonths(1)); // dayに6/1が入っているタイミング
+
+
+
 
 		// 4-1. 1日の曜日を表すDayOfWeekを取得
 		DayOfWeek w = day.getDayOfWeek();
@@ -79,9 +87,7 @@ public class TaskController {
 		//（月末を求めるにはLocalDate#lengthOfMonth()を使う）
 
 		LocalDate end = day.with(TemporalAdjusters.lastDayOfMonth()); // dayに月末が入っているタイミング
-		System.out.println("==================================================");
-		System.out.println(start);
-		System.out.println("==================================================");
+
 		System.out.println("==================================================");
 		System.out.println(end);
 		System.out.println("==================================================");
@@ -166,13 +172,11 @@ public class TaskController {
 	 * @return 遷移先
 	 */
 	@GetMapping("/main/edit/{id}")
-	public String edit(Model model,@PathVariable Integer id ) {
+	public String edit(Model model, @PathVariable Integer id) {
 		// リポジトリから idを使って取得
-		Tasks task  = repo.findById(id).orElseThrow();
-		model.addAttribute("task", task);  // マッピング
+		Tasks task = repo.findById(id).orElseThrow();
+		model.addAttribute("task", task); // マッピング
 		return "edit";
 	}
-
-
 
 }

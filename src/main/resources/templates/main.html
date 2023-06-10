@@ -10,6 +10,19 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
  rel="stylesheet">
 <link rel="stylesheet" type="text/css" th:href="@{/css/todo.css}">
+
+<script type="text/javascript">
+    function ChangeHidden() {
+      let elem = document.getAttribute('date');
+      if (elem.hidden == false) {
+        elem.hidden = true;
+      } else {
+        elem.hidden = false;
+      }
+    }
+  </script>
+
+
 </head>
 <body>
  <header class="header fixed">
@@ -32,7 +45,8 @@
     <form th:action="@{/main}" name="form1">
      <span class="material-icons sd"><input type="hidden"
       name="date" th:value="${#temporals.format(prev, 'yyyy-MM-dd')}"><a
-      class="prevnext" href="javascript:form1.submit()">keyboard_arrow_left</a></span>
+      class="prevnext" href="javascript:form1.submit()" onclick="ChangeHidden()>keyboard_arrow_left</a></span>
+      <! – class="prevnext" href="javascript:form1.submit()">keyboard_arrow_left</a></span>–>
     </form>
     <p class="test sd" style="margin: 5px 0px" th:text="${month}"></p>
     <form th:action="@{/main}" name="form2">
