@@ -37,7 +37,8 @@ public class TaskController {
 	 */
 
 	@GetMapping("/main")
-	public String main(Model model) {
+//	public String main(Model model, @ModelAttribute("form2") form2 form) {
+		public String main(Model model) {
 		// 1. 2次元表になるので、ListのListを用意する
 		List<List<LocalDate>> month = new ArrayList<>();
 
@@ -50,6 +51,8 @@ public class TaskController {
 
 		LocalDate day;
 		day = LocalDate.now();
+
+//		if(form.)
 		//その月の1日のLocalDate
 		day = LocalDate.of(day.getYear(), day.getMonthValue(), 1);
 
@@ -156,13 +159,6 @@ public class TaskController {
 		return "redirect:/main";
 	}
 
-//
-//	@GetMapping("edit/{id}")
-//	public String edit(Model model,Tasks tasks) {
-//		model.addAttribute("id", tasks.getId());
-//		return "edit";
-//	}
-
 	/**
 	 * 投稿を編集する
 	 *
@@ -171,8 +167,12 @@ public class TaskController {
 	 */
 	@GetMapping("/main/edit/{id}")
 	public String edit(Model model,@PathVariable Integer id ) {
-		model.addAttribute("id", id);
+		// リポジトリから idを使って取得
+		Tasks task  = repo.findById(id).orElseThrow();
+		model.addAttribute("task", task);  // マッピング
 		return "edit";
 	}
+
+
 
 }
