@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.dmm.tasks.data.entity.Tasks;
-import com.dmm.tasks.data.entity.Users;
 import com.dmm.tasks.data.repository.TasksRepository;
 import com.dmm.tasks.form.TasksForm;
 import com.dmm.tasks.service.AccountUserDetails;
@@ -103,7 +102,8 @@ public class TaskController {
 		MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
 
 		//始めの日付と終わりの日付を引数に入れる
-		List<Tasks> list = repo.findByDateBetween(start.atTime(0, 0), end.atTime(0, 0), Users.class.getName());
+		List<Tasks> list = repo.findAllByDateBetween(start.atTime(0, 0), end.atTime(0, 0));
+		//		List<Tasks> list = repo.findByDateBetween(start.atTime(0, 0), end.atTime(0, 0), Users.class.getName());
 
 		for (Tasks t : list) {
 			tasks.add(t.getDate().toLocalDate(), t);
@@ -147,7 +147,7 @@ public class TaskController {
 		//        String convert = datetimeFormatter.format(ldt);
 
 		//		task.setDate(LocalDateTime.of(localDate, taskForm.getDate()));
-		task.setDate(taskForm.getDate());
+		task.setDate(taskForm.getDate().atStartOfDay());
 		task.setDone(false);
 
 		// データベースに保存
@@ -156,5 +156,23 @@ public class TaskController {
 		return "redirect:/main";
 	}
 
-}
+//
+//	@GetMapping("edit/{id}")
+//	public String edit(Model model,Tasks tasks) {
+//		model.addAttribute("id", tasks.getId());
+//		return "edit";
+//	}
 
+	/**
+	 * 投稿を編集する
+	 *
+	 * @param id 投稿ID
+	 * @return 遷移先
+	 */
+	@GetMapping("/main/edit/{id}")
+	public String edit(Model model,@PathVariable Integer id ) {
+		model.addAttribute("id", id);
+		return "edit";
+	}
+
+}

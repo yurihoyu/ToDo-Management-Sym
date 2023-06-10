@@ -1,6 +1,6 @@
 package com.dmm.tasks.form;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.validation.constraints.Size;
 
@@ -19,6 +19,6 @@ public class TasksForm {
 	@Size(min = 1, max = 200)
 	private String text;
 
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDateTime date;
+	  @DateTimeFormat(pattern = "yyyy-MM-dd")
+	  private LocalDate date;
 }
