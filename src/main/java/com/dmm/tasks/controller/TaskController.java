@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.dmm.tasks.data.entity.Tasks;
+import com.dmm.tasks.data.entity.Users;
 import com.dmm.tasks.data.repository.TasksRepository;
 import com.dmm.tasks.form.TasksForm;
 import com.dmm.tasks.service.AccountUserDetails;
@@ -102,7 +103,7 @@ public class TaskController {
 		MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
 
 		//始めの日付と終わりの日付を引数に入れる
-		List<Tasks> list = repo.findAllByDateBetween(start.atTime(0, 0), end.atTime(0, 0));
+		List<Tasks> list = repo.findByDateBetween(start.atTime(0, 0), end.atTime(0, 0), Users.class.getName());
 
 		for (Tasks t : list) {
 			tasks.add(t.getDate().toLocalDate(), t);
