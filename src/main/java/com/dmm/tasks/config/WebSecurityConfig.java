@@ -38,7 +38,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		// 認可の設定
 		http.exceptionHandling().accessDeniedPage("/accessDeniedPage").and().authorizeRequests()
-		.antMatchers("/css/todo.css").permitAll() // css/todo.cssは、全ユーザからのアクセスを許可
+//		.antMatchers("/css/todo.css").permitAll() // css/todo.cssは、全ユーザからのアクセスを許可
 				.antMatchers("/loginForm").permitAll() // loginは、全ユーザからのアクセスを許可
 
 				.anyRequest().authenticated(); // login以外は、認証を求める
