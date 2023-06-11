@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -37,7 +38,7 @@ public class TaskController {
 	 */
 
 	@GetMapping("/main")
-	public String main(Model model) {
+	public String main(Model model, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
 		// 1. 2次元表になるので、ListのListを用意する
 		List<List<LocalDate>> month = new ArrayList<>();
 
@@ -53,6 +54,15 @@ public class TaskController {
 
 		//その月の1日のLocalDate
 		day = LocalDate.of(day.getYear(), day.getMonthValue(), 1);
+
+		if(date!=null) {
+			day = date;
+		}
+
+		model.addAttribute("date", day);
+
+		String text1 = day.getYear() +"年"+day.getMonthValue() + "月";
+		model.addAttribute("month", text1);
 
 		LocalDate start = day; // dayに月初が入っているタイミング
 
@@ -78,6 +88,7 @@ public class TaskController {
 			week.add(day);
 			day = day.plusDays(1);
 		}
+
 
 		month.add(week);
 		week = new ArrayList<>(); // 次週分のリストを用意
@@ -177,6 +188,27 @@ public class TaskController {
 		Tasks task = repo.findById(id).orElseThrow();
 		model.addAttribute("task", task); // マッピング
 		return "edit";
+	}
+
+	/**
+	 * 投稿を編集する
+	 *
+	 * @param id 投稿ID
+	 * @return 遷移先
+	 */
+	@PostMapping("/main/edit/{id}")
+	public String update(Model model, @PathVariable Integer id, @ModelAttribute Tasks task) {
+
+		Tasks t = new Tasks();
+		t.setId(id);
+		t.setName(task.getName());
+		t.setTitle(task.getTitle());
+		t.setText(task.getText());
+		t.setDate(task.getDate());
+		t.setDone(task.isDone());
+
+		model.addAttribute("task", t); // マッピング
+		return "main";
 	}
 
 }
