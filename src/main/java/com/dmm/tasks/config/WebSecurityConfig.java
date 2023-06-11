@@ -45,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// ログイン設定
 		http.formLogin() // フォーム認証の有効化
-				.loginPage("/loginform") // ログインフォームを表示するパス
+				.loginPage("/loginForm") // ログインフォームを表示するパス
 				.loginProcessingUrl("/authenticate") // フォーム認証処理のパス
 				.usernameParameter("userName") // ユーザ名のリクエストパラメータ名
 				.passwordParameter("password") // パスワードのリクエストパラメータ名
