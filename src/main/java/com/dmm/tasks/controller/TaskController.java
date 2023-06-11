@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -38,7 +37,9 @@ public class TaskController {
 	 */
 
 	@GetMapping("/main")
-	public String main(Model model, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+	public String main(Model model, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+			@AuthenticationPrincipal AccountUserDetails user) {
+
 		// 1. 2次元表になるので、ListのListを用意する
 		List<List<LocalDate>> month = new ArrayList<>();
 
@@ -55,13 +56,13 @@ public class TaskController {
 		//その月の1日のLocalDate
 		day = LocalDate.of(day.getYear(), day.getMonthValue(), 1);
 
-		if(date!=null) {
+		if (date != null) {
 			day = date;
 		}
 
 		model.addAttribute("date", day);
 
-		String text1 = day.getYear() +"年"+day.getMonthValue() + "月";
+		String text1 = day.getYear() + "年" + day.getMonthValue() + "月";
 		model.addAttribute("month", text1);
 
 		LocalDate start = day; // dayに月初が入っているタイミング
@@ -72,9 +73,6 @@ public class TaskController {
 
 		System.out.println("==================================================");
 		model.addAttribute("next", day.plusMonths(1)); // dayに6/1が入っているタイミング
-
-
-
 
 		// 4-1. 1日の曜日を表すDayOfWeekを取得
 		DayOfWeek w = day.getDayOfWeek();
@@ -89,7 +87,6 @@ public class TaskController {
 			day = day.plusDays(1);
 		}
 
-
 		month.add(week);
 		week = new ArrayList<>(); // 次週分のリストを用意
 
@@ -98,10 +95,6 @@ public class TaskController {
 		//（月末を求めるにはLocalDate#lengthOfMonth()を使う）
 
 		LocalDate end = day.with(TemporalAdjusters.lastDayOfMonth()); // dayに月末が入っているタイミング
-
-		System.out.println("==================================================");
-		System.out.println(end);
-		System.out.println("==================================================");
 
 		for (int i = 1; i <= end.getDayOfMonth(); i++) {
 			week.add(day);
@@ -120,10 +113,26 @@ public class TaskController {
 
 		// カレンダーの日付（LocalDate）とタスク情報（Tasks）とをセットでもつためのMultiValueMap
 		MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
+		List<Tasks> list;
+		//ユーザー名を取得
+		String name = user.getName().replace("-name", "");
+		boolean result = name.equals("admin");
 
-		//始めの日付と終わりの日付を引数に入れる
-		List<Tasks> list = repo.findAllByDateBetween(start.atTime(0, 0), end.atTime(0, 0));
-		//		List<Tasks> list = repo.findByDateBetween(start.atTime(0, 0), end.atTime(0, 0), Users.class.getName());
+		if (name.equals("admin")) {
+			//始めの日付と終わりの日付を引数に入れる
+			list = repo.findAllByDateBetween(start.atTime(0, 0), end.atTime(0, 0));
+
+		} else {
+
+			//始めの日付と終わりの日付を引数に入れる
+			list = repo.findByDateBetween(start.atTime(0, 0), end.atTime(0, 0), user.getName());
+
+		}
+
+		System.out.println("==================================================");
+		System.out.println(result);
+		System.out.println(name);
+		System.out.println("==================================================");
 
 		for (Tasks t : list) {
 			tasks.add(t.getDate().toLocalDate(), t);
@@ -197,18 +206,32 @@ public class TaskController {
 	 * @return 遷移先
 	 */
 	@PostMapping("/main/edit/{id}")
-	public String update(Model model, @PathVariable Integer id, @ModelAttribute Tasks task) {
+	public String update(Model model, TasksForm form, @PathVariable Integer id,
+			@AuthenticationPrincipal AccountUserDetails user) {
+		Tasks task = new Tasks();
+		task.setId(id);
+		task.setName(user.getName());
+		task.setTitle(form.getTitle());
+		task.setText(form.getText());
 
-		Tasks t = new Tasks();
-		t.setId(id);
-		t.setName(task.getName());
-		t.setTitle(task.getTitle());
-		t.setText(task.getText());
-		t.setDate(task.getDate());
-		t.setDone(task.isDone());
+		task.setDate(form.getDate().atTime(0, 0));
+		task.setDone(form.isDone());
 
-		model.addAttribute("task", t); // マッピング
-		return "main";
+		repo.save(task); // 更新したデータを再度リポジトリ（データベース）に保管
+
+		return "redirect:/main";
+	}
+
+	/**
+	 * 投稿を削除する
+	 *
+	 * @param id 投稿ID
+	 * @return 遷移先
+	 */
+	@PostMapping("/main/delete/{id}")
+	public String delete(@PathVariable Integer id) {
+		repo.deleteById(id);
+		return "redirect:/main";
 	}
 
 }

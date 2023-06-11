@@ -6,6 +6,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.sun.istack.NotNull;
+
 //import com.sample.Annotation.DayCheck;
 
 import lombok.Data;
@@ -21,4 +23,8 @@ public class TasksForm {
 
 	  @DateTimeFormat(pattern = "yyyy-MM-dd")
 	  private LocalDate date;
+
+	  @NotNull
+	  private boolean done;
+
 }
